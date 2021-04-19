@@ -1,0 +1,25 @@
+{
+  "name": "btr-codes",
+  "version": "1.0.0",
+  "description": "test code",
+  "main": "thesis_test_query.js",
+  "scripts": {
+    "test": "node thesis_test_query.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ammar257ammar/BTR-codes.git"
+  },
+  "keywords": [
+    "comunica"
+  ],
+  "author": "Test",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ammar257ammar/BTR-codes/issues"
+  },
+  "homepage": "https://github.com/ammar257ammar/BTR-codes#readme",
+  "dependencies": {
+    "@comunica/actor-init-sparql": "^1.20.0"
+  }
+}

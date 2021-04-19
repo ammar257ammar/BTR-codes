@@ -32,14 +32,27 @@ WHERE {
 	],
 }); */
 
-const result = (async()=> await myEngine.query(`
-  SELECT ?s ?p ?o WHERE {
-    ?s ?p <http://dbpedia.org/resource/Belgium>.
-    ?s ?p ?o
-  } LIMIT 100`, {
-  sources: ['http://fragments.dbpedia.org/2015/en'],
-}));
 
+const getResults = async function() {
+
+    const result = await myEngine.query(`
+      SELECT ?s ?p ?o WHERE {
+        ?s ?p <http://dbpedia.org/resource/Belgium>.
+        ?s ?p ?o
+      } LIMIT 100`, {
+      sources: ['http://fragments.dbpedia.org/2015/en'],
+    });
+
+    // data-listener
+    result.bindingsStream.on('data', (binding) => {
+    	console.log(binding.get('?s').value);
+    	console.log(binding.get('?s').termType);
+    	console.log(binding.get('?p').value);
+    	console.log(binding.get('?o').value);
+    });
+}
+
+getResults()
 
 // more sources
 /* 		'https://www.rubensworks.net',
@@ -51,14 +64,8 @@ const result = (async()=> await myEngine.query(`
 	'application/sparql-results+json');
 data.pipe(process.stdout); // print to standard output */
 
-// data-listener
-result.bindingsStream.on('data', (binding) => {
-	console.log(binding.get('?s').value);
-	console.log(binding.get('?s').termType);
-	console.log(binding.get('?p').value);
-	console.log(binding.get('?o').value);
-});
 
+/*
 // end-listener
 result.bindingStream.on('end', () => {
 	// data-listener not called anymore
@@ -68,7 +75,7 @@ result.bindingStream.on('end', () => {
 result.bindingsStream.on('error', (error) => {
 	console.error(error);
 });
-
+*/
 
 // getting results in a simple array, using asynchronous bindings() method
 /* const bindings = result.bndings();
