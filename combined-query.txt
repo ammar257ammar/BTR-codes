@@ -1,0 +1,73 @@
+SELECT DISTINCT 
+	?protein1
+	?protein2
+	?interaction ?interactionType ?quality
+	(SUM(xsd:integer(?numOfExperiments)) AS ?strength)
+	(SAMPLE(?doiUrl) AS ?ref)
+WHERE 
+{
+	?interaction rdf:type ?interactionType.
+	?interaction :quality ?quality.
+	?interaction :evidence ?evidence.
+  	
+	{
+		?evidence :numberOfExperiments ?numOfExperiments.
+	}
+  	UNION
+  	{
+	  	?evidence :reference ?reference.
+  		?reference :from ?doi.
+	  	FILTER REGEX(STR(?doi), "DOI:")
+	  	BIND(REPLACE(STR(?doi), "DOI:", "https://doi.org/") AS ?doiUrl)
+	}
+  
+	{
+		Select DISTINCT ?protein1 ?protein2 ?interaction
+		WHERE
+		{
+			?iso1 :interaction ?interaction.
+			?interaction :interactant ?iso2.
+			
+			{
+				?protein1 :isoform ?iso1.
+				?iso1 :goBiologicalProcess ?GO1.
+				?GO1 :term ?GOterm1.
+				?GOterm1 :childOf ?terms1.
+				VALUES ?terms1 { cv:GO_0042698 cv:GO_0032570 }
+				OPTIONAL
+				{
+					?GO1 rdfs:comment ?label1.
+				}
+				BIND ("PMDD" AS ?condition1)
+			}
+
+			{
+				?protein2 :isoform ?iso2.
+				{  
+					?iso2 :goBiologicalProcess ?GO2.
+					?GO2 :term ?GOterm2.
+					?GOterm2 :childOf ?terms2.
+					VALUES ?terms { cv:GO_0016917 cv:GO_0007210 cv:GO_0099589}
+
+					OPTIONAL
+					{
+						?GO2 rdfs:comment ?label2.
+					}
+					BIND ("Depression related biological process" AS ?condition2)
+				}
+				UNION
+				{
+					?iso2 :disease ?disease2.
+					?disease2 :term cv:DI-00697.
+
+					OPTIONAL
+					{
+						?disease2 rdfs:comment ?label2.
+					}
+					BIND ("Depression related disease" AS ?condition2)	
+				}
+			}
+		}
+	}
+}
+GROUP BY ?protein1 ?protein2 ?interaction ?interactionType ?quality
